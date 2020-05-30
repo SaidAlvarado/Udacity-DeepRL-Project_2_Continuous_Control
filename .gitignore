@@ -4,8 +4,9 @@
 # Ignore the folder with the Unity Environment.
 Reacher_Linux/
 
-
-
+# Ignore the intermediary checkpoints of the training process
+/checkpoint_actor.pth
+/checkpoint_critic.pth
 
 
 
