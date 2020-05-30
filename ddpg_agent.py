@@ -14,8 +14,13 @@ BATCH_SIZE = 128        # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor
-LR_CRITIC = 1e-3        # learning rate of the critic
+LR_CRITIC = 1e-4        # learning rate of the critic
+# LR_ACTOR = 1e-3         # learning rate of the actor
+# LR_CRITIC = 1e-3        # learning rate of the critic
 WEIGHT_DECAY = 0        # L2 weight decay
+
+UPDATE_EVERY = 20       # Timesteps to wait before updating the network
+UPDATE_STEPS = 10       # Times to run the learning process at each UPDATE_EVERY
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -51,15 +56,24 @@ class Agent():
         # Replay memory
         self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, random_seed)
 
+        # Times the step algorithm has been called
+        self.timestep = 0
+
     def step(self, state, action, reward, next_state, done):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
         self.memory.add(state, action, reward, next_state, done)
 
+        # Count that you took a new step
+        self.timestep += 1
+
         # Learn, if enough samples are available in memory
-        if len(self.memory) > BATCH_SIZE:
-            experiences = self.memory.sample()
-            self.learn(experiences, GAMMA)
+        if len(self.memory) > BATCH_SIZE and self.timestep % UPDATE_EVERY == 0:
+            # Run the learning process UPDATE_STEPS times.
+            for _ in range(UPDATE_STEPS):
+                # LEARN!!
+                experiences = self.memory.sample()
+                self.learn(experiences, GAMMA)
 
     def act(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
@@ -101,6 +115,7 @@ class Agent():
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)
         self.critic_optimizer.step()
 
         # ---------------------------- update actor ---------------------------- #
