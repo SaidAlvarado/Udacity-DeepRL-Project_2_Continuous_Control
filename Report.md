@@ -1,4 +1,4 @@
-# Udacity's Deep RL Nanodegree - Project 1: Navigation
+# Udacity's Deep RL Nanodegree - Project 2: Continuous Control
 
 ## Technical Report
 
@@ -8,7 +8,7 @@ In this report we will talk in detail about the algorithms and techniques used t
 
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/11748427/80967527-cc864e00-8e16-11ea-8467-df71ffbbeb5b.gif" alt="Trained Agent"/>
+  <img src="https://user-images.githubusercontent.com/11748427/83365478-9c47b600-a3a8-11ea-92b0-a750598a70e7.gif" alt="Trained Agent"/>
 </p>
 
 
@@ -19,48 +19,41 @@ In this report we will talk in detail about the algorithms and techniques used t
 
 #### Environment
 
-In this scenario the RL-agent is dropped into a large square environment where it must collect yellow bananas scattered around a square world while avoiding the blue ones. The environment was made with Unity's ML-Agents framework. It roughly looks as following, looking from the top:
-
+In this scenario an RL-agent is tasked with controlling a two-jointed arm as it move to track a target circling around it. The environment was made with Unity's ML-Agents framework and there are two variations one environment has 20 agents operating individually for parallel learning, and the other one only has a single agent. The task looks roughly as follows:
 
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/11748427/81232112-9272a300-8ff4-11ea-82a1-72e6f9a9c132.png" alt="Environment"/>
+  <img src="https://user-images.githubusercontent.com/11748427/83365528-f2b4f480-a3a8-11ea-9f84-b5ed18bcd9b7.png"/>
   
 </p>
 
 
 
-This environment provides the following rewards:
 
-- Each **yellow** banana collected provides a reward of **+1**.
-- Each **blue** banana collected provides a reward of **-1**.
-- No rewards are provided in a per-time-step basis.
+#### Rewards
+This environment provides the following rewards:
+A reward of **`+0.1`** is provided for each step that the agent's hand is in the goal location.
 
 
 
 #### Actions
 
-The agent has four discrete actions available at it's disposal:
-- **`0`** - move forward.
-- **`1`** - move backward.
-- **`2`** - turn left.
-- **`3`** - turn right.
+This is a **Continuous action** scenario. As such, each action is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between **`-1`** and **`1`**.
 
 
 
 #### State Space
 
-The state space has 37 dimensions and consists of the agent's velocity, as well as ray-based perception of objects in front of the agent.
+The state space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. 
+
+
+### Deep Deterministic Policy Gradient (DDPG)
 
 
 
-### Deep-Q Learning
+This exercise was solved using as a base the Deep Deterministic Policy Gradient techniques from the following [paper](https://arxiv.org/abs/1509.02971). 
 
-
-
-This exercise was solved replicating the Deep-Q learning techniques from the famous Google Mind's [paper](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf). 
-
-> Mnih, V., Kavukcuoglu, K., Silver, D. *et al.* Human-level control through deep reinforcement learning.                    *Nature* **518,** 529–533 (2015). 
+> TP Lillicrap, JJ Hunt, A Pritzel, *et al.* Continuous control with deep reinforcement learning (2015). 
 
 
 
@@ -69,7 +62,7 @@ Which implements the following algorithm:
 
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/11748427/81232258-db2a5c00-8ff4-11ea-8693-b29667b85a22.png" width="70%" height="70%" alt="Algorithm description"/>
+  <img src="https://user-images.githubusercontent.com/11748427/83365536-19732b00-a3a9-11ea-9dd1-1d03e7dc7d53.png" width="70%" height="70%" alt="Algorithm description"/>
 </p>
 
 This works particularly well for the current environment given that both its **State Space** and **Action Space** are discrete.
@@ -78,29 +71,30 @@ This works particularly well for the current environment given that both its **S
 
 #### Neural Network.
 
-To approximate the **Action-Value Function** we can use a Deep Neural Network just as suggested in the paper. However, given that the input is not an image, there is no need to use a Convolutional Architecture. Instead, a network with two fully connected  RELU internal layers ending with a softmax function is sufficient.
+Since this is arguabl an Actor-Critic method, we require 2 Neural Networks. One to estimate the best action for a particular state, and another one to estimate the Value Function. Each of these must have a duplicate network which will serve as the _Target_ during training. Given that the input is not an image, there is no need to use a Convolutional Architecture. Instead, it is sufficient to have networks with two fully connected RELU internal layers ending with a Tanh function and linear function for the actor and the critic respectively.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/11748427/81235783-082e3d00-8ffc-11ea-9c78-aa02ea1db685.png" alt="Neural Network"/>
+  <img src="https://user-images.githubusercontent.com/11748427/83365580-71aa2d00-a3a9-11ea-8929-dc6b7357150c.png" alt="Neural Network"/>
 </p>
 
 
 
 #### Experience Replay
 
-All steps' **`(State, Action, Reward, Next State)`**   tuples are saved in to a queue in memory. Every **`4`** time steps, a mini-batch of **`64`** tuples are selected to update the Neural Network weights.
+All steps' **`(State, Action, Reward, Next State)`**   tuples are saved in to a queue in memory. Every **`20`** time steps **`10`** learning passes are performed, in which a mini-batch of **`256`** tuples are selected to update the Neural Network weights. 
 
-#### Target Network
+#### Ornstein-Uhlenbeck Noise
 
-Two Neural Networks (with the same exact architecture) are used simultaneously for the learning process. The main network is used to select the best action for a given state.
+Since this is as scenario with a continuous action space, it is not posible to use the Epsilon-greedy method of adding randomness to the decision in order to encourage exploration of the state-action space. To substitute this we can use the Ornstein-Uhlenbeck process to add some variance to the decision process.
 
-The second network is used to generate the target labels against which the error to back-propagate the weights are calculated. 
+**IMPORTANT NOTE:** If the environment with multple agents is going to be used, it is imperative that output dimension of the noise process is adjusted to generate the correct shape of noise for all the agents simultaneously, namely, **`(20,4)`**. **Otherwise, the agent will not converge** irrespective of how you adjust all other hyperparameters.
 
-The Loss functions if therefore defined as:
 
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/11748427/81232522-5b50c180-8ff5-11ea-816e-6c137aa0eb2d.png"/>
-</p>
+#### Target Network Soft Updates
+
+Unlike other methods which update the target network by directly copying the parameters of the local network, this algorithm slowly mixes the weights of the target network and the local network **`0.1%`** each timestep.
+
+
 
 
 #### Selected Hyper-parameters
@@ -108,12 +102,15 @@ The Loss functions if therefore defined as:
 The code uses the following Hyper-parameters:
 
 - **`Number of Hidden Layers`**  =  2
-- **`Neurons per layers`**  =  64 
+- **`Neurons in 1° layer`**  =  300 
+- **`Neurons in 2° layer`**  =  200 
 - **`Gamma`**  =  0.99
 - **`TAU`**  =  1e-3
-- **`Learning Rate`**  =  5e-4
-- **`Steps per update`**  =  4
-- **`Batch Size`**  =  64
+- **`Actor Learning Rate`**  =  2e-4
+- **`Critic Learning Rate`**  =  1e-4
+- **`Steps per update`**  =  20
+- **`Updates performed per step`**  =  10
+- **`Batch Size`**  =  256
 
 
 
@@ -123,21 +120,16 @@ When simulated, we receive the following plot of score over episodes.
 
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/11748427/81232710-a66ad480-8ff5-11ea-9006-12a2e9108223.png"/>
+  <img src="https://user-images.githubusercontent.com/11748427/83365607-9bfbea80-a3a9-11ea-87d5-afb993146a08.png"/>
 </p>
 
 
 
-As it can be seen, the algorithm achieves an average score of 13 in about 800 episodes, effectively solving the Task.
+As it can be seen, the algorithm achieves an average score of 30 in about 124 episodes, effectively solving the Task.
 
 
 
 ### Future work
 
-There are several ways to improve this project. The implemented algorithm is 5 years old now and there are several know improvements for the Deep-Q Learning algorithm. For example, the mini-batch are currently chosen completely at random, instead of using **Importance Sampling.**
+There are several ways to improve this algorithm. As it was currently implemeted, in the update process of the Critic network the Expected returns are calculated using a 1-step Bootstraping TD estimation. It would be interesting enhance the algorithm with a Generalized Advantage Estimation, such as Lambda Return.
 
-
----
-
-
-The banana icons used in the diagramas are made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
