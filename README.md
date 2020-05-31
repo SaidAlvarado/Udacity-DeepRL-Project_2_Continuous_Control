@@ -1,4 +1,4 @@
-# Udacity's Deep RL Nanodegree - Project 1: Navigation
+# Udacity's Deep RL Nanodegree - Project 2: Continuous Control
 
 [//]: # (Image References)
 
@@ -7,7 +7,7 @@
 
 ## Introduction
 
-This repository contains my solution for the first project of the Deep Reinforcement Learning Nanodegree from Udacity. In this exercise an RL-agent is dropped into a large square environment where it must collect yellow bananas scattered around the world while avoiding the blue ones. The environment was made with Unity's ML-Agents framework. 
+This repository contains my solution for the second project of the Deep Reinforcement Learning Nanodegree from Udacity. In this exercise an RL-agent is tasked with controlling a two-jointed arm as it move to track a target circling around it. The environment was made with Unity's ML-Agents framework and there are two variations one environment has 20 agents operating individually for parallel learning, and the other one only has a single agent.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/11748427/80967527-cc864e00-8e16-11ea-8467-df71ffbbeb5b.gif" alt="Trained Agent"/>
@@ -18,25 +18,19 @@ This repository contains my solution for the first project of the Deep Reinforce
 
 #### Rewards
 
-- Each **yellow** banana collected provides a reward of **+1**.
-- Each **blue** banana collected provides a reward of **-1**.
-- No rewards are provided in a per-time-step basis.
+A reward of **`+0.1`** is provided for each step that the agent's hand is in the goal location.
 
 #### State Space
 
-The state space has 37 dimensions and consists of the agent's velocity, as well as ray-based perception of objects in front of the agent.
+The state space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. 
 
 #### Action Space
 
-The agent has four discrete actions available at it's disposal:
-- **`0`** - move forward.
-- **`1`** - move backward.
-- **`2`** - turn left.
-- **`3`** - turn right.
+Each action is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between **`-1`** and **`1`**.
 
 #### Task Goal
 
-The agent must learn to select the appropriate action to maximize the amount of yellow bananas it collects in each episode of the task. In order to consider the environment solved, the agent must get an average score of +13 over 100 consecutive episodes.
+Such as the goal of the agent is to maintain its position at the target locations for as many time steps as possible.. In order to consider the environment solved, the agent must get an average score of +30 over 100 consecutive episodes. In the case of the environment with 20 agents, the score of an episode is calculated as the average of the scores of all agents.
 
 
 
@@ -63,8 +57,8 @@ Most of these instructions were borrowed from the instalation instructions in Ud
 
 2. Clone the repository (if you haven't already!), and navigate to the `python/` folder.  Then, install several dependencies.
 ```bash
-git clone https://github.com/SaidAlvarado/Udacity-DeepRL-Project_1_Navigation.git
-cd Udacity-DeepRL-Project_1_Navigation/python
+git clone https://github.com/SaidAlvarado/Udacity-DeepRL-Project_2_Continuous_Control.git
+cd Udacity-DeepRL-Project_2_Continuous_Control/python
 pip install .
 ```
 
@@ -81,16 +75,24 @@ python -m ipykernel install --user --name drlnd --display-name "drlnd"
 
 
 5. Download the environment from one of the links below.  You need only select the environment that matches your operating system:
-    - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux.zip)
-    - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana.app.zip)
-    - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86.zip)
-    - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86_64.zip)
+
+    - **_Version 1: One (1) Agent_**
+        - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Linux.zip)
+        - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher.app.zip)
+        - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Windows_x86.zip)
+        - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Windows_x86_64.zip)
+
+    - **_Version 2: Twenty (20) Agents_**
+        - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Linux.zip)
+        - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher.app.zip)
+        - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Windows_x86.zip)
+        - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Windows_x86_64.zip)
 
 6. Decompress the file into the root directory of the repository.
 
 ### Run the code.
 
-7. Follow the instructions in `Navigation.ipynb` to train and see the agent in action.
+7. Follow the instructions in `DDPG_Continuous_Control.ipynb` to train and see the agent in action.
 
 
 ## Understanding the Algorithm
