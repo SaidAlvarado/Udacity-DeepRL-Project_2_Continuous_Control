@@ -12,16 +12,11 @@ import torch.optim as optim
 import time
 
 BUFFER_SIZE = int(1e5)  # replay buffer size
-BATCH_SIZE = 256        # minibatch size
-# BATCH_SIZE = 128        
+BATCH_SIZE = 256        # minibatch size  
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 2e-4         # learning rate of the actor
 LR_CRITIC = 1e-4        # learning rate of the critic
-# LR_ACTOR = 2e-4         # learning rate of the actor
-# LR_CRITIC = 1e-4        # learning rate of the critic
-# LR_ACTOR = 1e-3         # learning rate of the actor
-# LR_CRITIC = 1e-3        # learning rate of the critic
 WEIGHT_DECAY = 0        # L2 weight decay
 
 UPDATE_EVERY = 20       # Timesteps to wait before updating the network
@@ -58,7 +53,6 @@ class Agent():
 
         # Noise process
         self.noise = OUNoise((num_agents, action_size), random_seed)
-#         self.noise = OUNoise(action_size, random_seed)
 
         # Replay memory
         self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, random_seed)
@@ -68,11 +62,8 @@ class Agent():
 
     def step(self, state, action, reward, next_state, done):
         """Save experience in replay memory, and use random sample from buffer to learn."""
-        # Save experience / reward
-        # t0 = time.time()
-        # self.memory.add(state, action, reward, next_state, done)
-        # print("\t [*] memory.add() = {:.2}ms ".format(1000*(time.time() - t0)))
 
+        # Save experience / reward
         for i in range(self.num_agents):
             # Add to the replay buffer the experience of each of the agents
             self.memory.add(state[i], action[i], reward[i], next_state[i], done[i])
@@ -80,11 +71,7 @@ class Agent():
         # Count that you took a new step
         self.timestep += 1
 
-#         # # Learn, if enough samples are available in memory
-#         if len(self.memory) > BATCH_SIZE:
-#             experiences = self.memory.sample()
-#             self.learn(experiences, GAMMA)
-
+        # # Learn, if enough samples are available in memory
         if len(self.memory) > BATCH_SIZE and self.timestep % UPDATE_EVERY == 0:
             # Run the learning process UPDATE_STEPS times.
             for _ in range(UPDATE_STEPS):
@@ -132,6 +119,7 @@ class Agent():
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
+        # Clip the gradients of the Critic to 1.
         torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)
         self.critic_optimizer.step()
 
