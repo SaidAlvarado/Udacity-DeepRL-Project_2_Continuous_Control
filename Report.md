@@ -46,6 +46,7 @@ This is a **Continuous action** scenario. As such, each action is a vector with 
 
 The state space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. 
 
+---
 
 ### Deep Deterministic Policy Gradient (DDPG)
 
@@ -71,7 +72,7 @@ This works particularly well for the current environment given that both its **S
 
 #### Neural Network.
 
-Since this is arguabl an Actor-Critic method, we require 2 Neural Networks. One to estimate the best action for a particular state, and another one to estimate the Value Function. Each of these must have a duplicate network which will serve as the _Target_ during training. Given that the input is not an image, there is no need to use a Convolutional Architecture. Instead, it is sufficient to have networks with two fully connected RELU internal layers ending with a Tanh function and linear function for the actor and the critic respectively.
+Since this is arguably an Actor-Critic method, we require 2 Neural Networks. One to estimate the best action for a particular state, and another one to estimate the Value Function. Each of these must have a duplicate network which will serve as the _Target_ during training. Given that the input is not an image, there is no need to use a Convolutional Architecture. Instead, it is sufficient to have networks with two fully connected RELU internal layers ending with a Tanh function and linear function for the actor and the critic respectively.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/11748427/83365580-71aa2d00-a3a9-11ea-8929-dc6b7357150c.png" alt="Neural Network"/>
@@ -85,9 +86,9 @@ All steps' **`(State, Action, Reward, Next State)`**   tuples are saved in to a 
 
 #### Ornstein-Uhlenbeck Noise
 
-Since this is as scenario with a continuous action space, it is not posible to use the Epsilon-greedy method of adding randomness to the decision in order to encourage exploration of the state-action space. To substitute this we can use the Ornstein-Uhlenbeck process to add some variance to the decision process.
+Since this is as scenario with a continuous action space, it is not possible to use the Epsilon-greedy method of adding randomness to the decision in order to encourage exploration of the state-action space. To substitute this we can use the Ornstein-Uhlenbeck process to add some variance to the decision process.
 
-**IMPORTANT NOTE:** If the environment with multple agents is going to be used, it is imperative that output dimension of the noise process is adjusted to generate the correct shape of noise for all the agents simultaneously, namely, **`(20,4)`**. **Otherwise, the agent will not converge** irrespective of how you adjust all other hyperparameters.
+**IMPORTANT NOTE:** If the environment with multiple agents is going to be used, it is imperative that output dimension of the noise process is adjusted to generate the correct shape of noise for all the agents simultaneously, namely, **`(20,4)`**. **Otherwise, the agent will not converge** irrespective of how you adjust all other hyper-parameters.
 
 
 #### Target Network Soft Updates
@@ -112,7 +113,7 @@ The code uses the following Hyper-parameters:
 - **`Updates performed per step`**  =  10
 - **`Batch Size`**  =  256
 
-
+---
 
 ### Results
 
@@ -128,8 +129,8 @@ When simulated, we receive the following plot of score over episodes.
 As it can be seen, the algorithm achieves an average score of 30 in about 124 episodes, effectively solving the Task.
 
 
-
+---
 ### Future work
 
-There are several ways to improve this algorithm. As it was currently implemeted, in the update process of the Critic network the Expected returns are calculated using a 1-step Bootstraping TD estimation. It would be interesting enhance the algorithm with a Generalized Advantage Estimation, such as Lambda Return.
+There are several ways to improve this algorithm. As it was currently implemented, in the update process of the Critic network the Expected returns are calculated using a 1-step Bootstraping TD estimation. It would be interesting enhance the algorithm with a Generalized Advantage Estimation, such as Lambda Return.
 
