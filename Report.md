@@ -19,7 +19,7 @@ In this report we will talk in detail about the algorithms and techniques used t
 
 #### Environment
 
-In this scenario an RL-agent is tasked with controlling a two-jointed arm as it move to track a target circling around it. The environment was made with Unity's ML-Agents framework and there are two variations one environment has 20 agents operating individually for parallel learning, and the other one only has a single agent. The task looks roughly as follows:
+In this scenario an RL-agent is tasked with controlling a two-jointed arm as it moves to track the position of a target circling around it. The environment was made with Unity's ML-Agents framework and there are two variations: One environment has 20 agents operating individually for parallel learning, and the other one only has a single agent. The task looks roughly as follows:
 
 
 <p align="center">
@@ -38,7 +38,7 @@ A reward of **`+0.1`** is provided for each step that the agent's hand is in the
 
 #### Actions
 
-This is a **Continuous action** scenario. As such, each action is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between **`-1`** and **`1`**.
+This is a **Continuous action** scenario. As such, each action is a vector with four numbers corresponding tothe torque applicable to the two joints. Every entry in the action vector should be a number between **`-1`** and **`1`**.
 
 
 
@@ -66,13 +66,13 @@ Which implements the following algorithm:
   <img src="https://user-images.githubusercontent.com/11748427/83365536-19732b00-a3a9-11ea-9dd1-1d03e7dc7d53.png" width="70%" height="70%" alt="Algorithm description"/>
 </p>
 
-This works particularly well for the current environment given that both its **State Space** and **Action Space** are discrete.
+This works particularly well for the current environment given that both its **State Space** and **Action Space** are continuous.
 
 
 
 #### Neural Network.
 
-Since this is arguably an Actor-Critic method, we require 2 Neural Networks. One to estimate the best action for a particular state, and another one to estimate the Value Function. Each of these must have a duplicate network which will serve as the _Target_ during training. Given that the input is not an image, there is no need to use a Convolutional Architecture. Instead, it is sufficient to have networks with two fully connected RELU internal layers ending with a Tanh function and linear function for the actor and the critic respectively.
+Since this is arguably an Actor-Critic method, we require 2 Neural Networks. One to estimate the best action for a particular state and another one to estimate the Value Function. Each of these must have a duplicate network which will serve as the _Target_ during training. Given that the input is not an image, there is no need to use a Convolutional Architecture. Instead, it is sufficient to have networks with two fully connected RELU internal layers ending with a Tanh function and linear function for the actor and the critic respectively.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/11748427/83365580-71aa2d00-a3a9-11ea-8929-dc6b7357150c.png" alt="Neural Network"/>
@@ -86,14 +86,14 @@ All steps' **`(State, Action, Reward, Next State)`**   tuples are saved in to a 
 
 #### Ornstein-Uhlenbeck Noise
 
-Since this is as scenario with a continuous action space, it is not possible to use the Epsilon-greedy method of adding randomness to the decision in order to encourage exploration of the state-action space. To substitute this we can use the Ornstein-Uhlenbeck process to add some variance to the decision process.
+Since this is as scenario with a continuous action space, it is not possible to use the Epsilon-greedy method of adding randomness to the actions in order to encourage exploration of the state-action space. To substitute this we can use the Ornstein-Uhlenbeck process to add some variance to the decisions of the algorithm.
 
-**IMPORTANT NOTE:** If the environment with multiple agents is going to be used, it is imperative that output dimension of the noise process is adjusted to generate the correct shape of noise for all the agents simultaneously, namely, **`(20,4)`**. **Otherwise, the agent will not converge** irrespective of how you adjust all other hyper-parameters.
+**IMPORTANT NOTE:** If the environment with multiple agents is going to be used, it is imperative that the output dimension of the noise process is adjusted to generate the correct shape of noise for all the agents simultaneously, namely, **`(20,4)`**. **Otherwise, the agent's training will not converge** irrespective of how you adjust all other hyper-parameters.
 
 
 #### Target Network Soft Updates
 
-Unlike other methods which update the target network by directly copying the parameters of the local network, this algorithm slowly mixes the weights of the target network and the local network **`0.1%`** each timestep.
+Unlike other methods which update the target network by directly copying the parameters of the local network, this algorithm slowly mixes the weights of the target network and the local network by **`0.1%`** each timestep.
 
 
 
