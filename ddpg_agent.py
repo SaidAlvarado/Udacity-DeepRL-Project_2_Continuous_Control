@@ -12,7 +12,7 @@ import torch.optim as optim
 import time
 
 BUFFER_SIZE = int(1e5)  # replay buffer size
-BATCH_SIZE = 256        # minibatch size  
+BATCH_SIZE = 256        # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 2e-4         # learning rate of the actor
@@ -168,7 +168,7 @@ class OUNoise:
     def sample(self):
         """Update internal state and return it as a noise sample."""
         x = self.state
-        dx = self.theta * (self.mu - x) + self.sigma * np.random.standard_normal(self.size)
+        dx = self.theta * (self.mu - x) + self.sigma * np.random.normal(mu=0,sigma=1,size=self.size)
         self.state = x + dx
         return self.state
 
