@@ -7,10 +7,10 @@
 
 ## Introduction
 
-This repository contains my solution for the second project of the Deep Reinforcement Learning Nanodegree from Udacity. In this exercise an RL-agent is tasked with controlling a two-jointed arm as it move to track a target circling around it. The environment was made with Unity's ML-Agents framework and there are two variations one environment has 20 agents operating individually for parallel learning, and the other one only has a single agent.
+This repository contains my solution for the second project of the Deep Reinforcement Learning Nanodegree from Udacity. In this exercise an RL-agent is tasked with controlling a two-jointed arm as it moves to track the position of a target circling around it. The environment was made with Unity's ML-Agents framework and there are two variations one environment has 20 agents operating individually for parallel learning, and the other one only has a single agent.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/11748427/80967527-cc864e00-8e16-11ea-8467-df71ffbbeb5b.gif" alt="Trained Agent"/>
+  <img src="https://user-images.githubusercontent.com/11748427/83365478-9c47b600-a3a8-11ea-92b0-a750598a70e7.gif" alt="Trained Agent"/>
 </p>
 
 
@@ -30,13 +30,13 @@ Each action is a vector with four numbers, corresponding to torque applicable to
 
 #### Task Goal
 
-Such as the goal of the agent is to maintain its position at the target locations for as many time steps as possible.. In order to consider the environment solved, the agent must get an average score of +30 over 100 consecutive episodes. In the case of the environment with 20 agents, the score of an episode is calculated as the average of the scores of all agents.
+Such as the goal of the agent is to maintain its position at the target locations for as many time steps as possible. In order to consider the environment solved, the agent must get an average score of +30 over 100 consecutive episodes. In the case of the environment with 20 agents, the score of an episode is calculated as the average of the scores of all agents.
 
 
 
 ## Getting Started
 
-Most of these instructions were borrowed from the instalation instructions in Udacity's [Deep Reinforcement Learning Repository](https://github.com/udacity/deep-reinforcement-learning).
+Most of these instructions were borrowed from the installation instructions in Udacity's [Deep Reinforcement Learning Repository](https://github.com/udacity/deep-reinforcement-learning).
 
 
 ### Prepare the Anaconda Environment
